@@ -13,6 +13,8 @@ function joinGame() {
   document.getElementById('game').style.display = 'block';
 }
 
+window.joinGame = joinGame;
+
 socket.on('assignRole', data => {
   document.getElementById('roleInfo').innerText = `Rolünüz: ${data.role}`;
 });
