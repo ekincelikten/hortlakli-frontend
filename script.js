@@ -1,69 +1,34 @@
-
-const socket = io();
-let currentPhase = 'lobby';
-let currentRole = '';
+const socket = io('https://hortlakli-koy-demo-1.onrender.com');
+let nickname = '';
+let lobbyId = null;
 
 function joinGame() {
-  const nickname = document.getElementById('nicknameInput').value.trim();
-  if (!nickname) {
-    alert("Lütfen bir nickname girin.");
-    return;
-  }
-
+  nickname = document.getElementById('nickname').value;
+  if (!nickname) return;
   socket.emit('joinGame', nickname);
-  document.getElementById('joinSection').style.display = 'none';
+  document.getElementById('lobby').style.display = 'none';
+  document.getElementById('game').style.display = 'block';
 }
 
-socket.on('assignRole', ({ role, avatar }) => {
-  currentRole = role;
-  document.getElementById('myRole').innerText = `Rolün: ${role}`;
-  document.getElementById('myAvatar').src = avatar;
+socket.on('assignRole', data => {
+  document.getElementById('roleInfo').innerText = `Rolünüz: ${data.role}`;
 });
 
-socket.on('phaseChange', (phase) => {
-  currentPhase = phase;
-  document.getElementById('phaseDisplay').innerText = `Faz: ${phase}`;
+socket.on('phaseChange', phase => {
+  const chat = document.getElementById('chat');
+  chat.innerHTML += `<p><em>Faz: ${phase}</em></p>`;
 });
 
-socket.on('updatePlayers', (players) => {
+socket.on('updatePlayers', players => {
   const container = document.getElementById('players');
   container.innerHTML = '';
   players.forEach(p => {
-    if (!p.isAlive) return;
-    const card = document.createElement('div');
-    card.className = 'avatar-card';
-    card.innerHTML = `
-      <img src="${p.avatar}" alt="${p.nickname}" data-nick="${p.nickname}">
-      <p>${p.nickname}</p>
-    `;
-    card.onclick = () => handleAvatarClick(p.nickname);
-    container.appendChild(card);
+    const img = document.createElement('img');
+    img.src = p.avatar;
+    img.title = p.nickname;
+    img.onclick = () => alert(`${p.nickname} seçildi (görev tıklaması)`); // placeholder
+    container.appendChild(img);
+    container.appendChild(document.createTextNode(p.nickname));
+    container.appendChild(document.createElement('br'));
   });
 });
-
-socket.on('investigationResult', ({ target, isHortlak }) => {
-  const mesaj = isHortlak ? `${target} bir hortlak!` : `${target} masum.`;
-  alert(mesaj);
-});
-
-function handleAvatarClick(nickname) {
-  if (currentPhase !== 'night') return;
-
-  switch (currentRole) {
-    case 'Dedektif':
-      socket.emit('dedektifAvatarTiklama', nickname);
-      break;
-    case 'Gulyabani':
-      socket.emit('nightAction', { action: 'kill', target: nickname });
-      break;
-    case 'İfrit':
-      socket.emit('nightAction', { action: 'silence', target: nickname });
-      break;
-    case 'Doktor':
-      socket.emit('nightAction', { action: 'protect', target: nickname });
-      break;
-    case 'Gardiyan':
-      socket.emit('nightAction', { action: 'jail', target: nickname });
-      break;
-  }
-}
