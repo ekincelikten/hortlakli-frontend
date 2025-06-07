@@ -1,6 +1,5 @@
 const socket = io('https://hortlakli-koy-demo-1.onrender.com');
 let nickname = '';
-let lobbyId = null;
 
 function joinGame() {
   nickname = document.getElementById('nickname').value;
@@ -13,7 +12,9 @@ function joinGame() {
   document.getElementById('game').style.display = 'block';
 }
 
-window.joinGame = joinGame;
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('joinBtn').addEventListener('click', joinGame);
+});
 
 socket.on('assignRole', data => {
   document.getElementById('roleInfo').innerText = `Rolünüz: ${data.role}`;
