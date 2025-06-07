@@ -32,3 +32,15 @@ body {
   font-weight: bold;
   color: white;
 }
+#joinSection {
+  margin-top: 20px;
+}
+#nicknameInput {
+  padding: 8px;
+  font-size: 16px;
+}
+button {
+  padding: 8px 16px;
+  font-size: 16px;
+  margin-left: 10px;
+}

@@ -3,6 +3,17 @@ const socket = io();
 let currentPhase = 'lobby';
 let currentRole = '';
 
+function joinGame() {
+  const nickname = document.getElementById('nicknameInput').value.trim();
+  if (!nickname) {
+    alert("Lütfen bir nickname girin.");
+    return;
+  }
+
+  socket.emit('joinGame', nickname);
+  document.getElementById('joinSection').style.display = 'none';
+}
+
 socket.on('assignRole', ({ role, avatar }) => {
   currentRole = role;
   document.getElementById('myRole').innerText = `Rolün: ${role}`;
